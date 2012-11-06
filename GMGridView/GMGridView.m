@@ -1175,8 +1175,16 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
 - (GMGridViewCell *)newItemSubViewForPosition:(NSInteger)position
 {
     GMGridViewCell *cell = [self.dataSource GMGridView:self cellForItemAtIndex:position];
-    CGPoint origin = [self.layoutStrategy originForItemAtPosition:position];
-    CGRect frame = CGRectMake(origin.x, origin.y, _itemSize.width, _itemSize.height);
+    CGRect frame;
+    if([self.layoutStrategy respondsToSelector:@selector(frameForItemAtPosition:)])
+    {
+        frame = [self.layoutStrategy frameForItemAtPosition:position];
+    }
+    else
+    {
+        CGPoint origin = [self.layoutStrategy originForItemAtPosition:position];
+        frame = CGRectMake(origin.x, origin.y, _itemSize.width, _itemSize.height);
+    }
     
     // To make sure the frame is not animated
     [self applyWithoutAnimation:^{
@@ -1304,9 +1312,16 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
             if (view != _sortMovingItem && view != _transformingItem) 
             {
                 NSInteger index = view.tag - kTagOffset;
-                CGPoint origin = [self.layoutStrategy originForItemAtPosition:index];
-                CGRect newFrame = CGRectMake(origin.x, origin.y, _itemSize.width, _itemSize.height);
-                
+                CGRect newFrame;
+                if([self.layoutStrategy respondsToSelector:@selector(frameForItemAtPosition:)])
+                {
+                    newFrame = [self.layoutStrategy frameForItemAtPosition:index];
+                }
+                else
+                {
+                    CGPoint origin = [self.layoutStrategy originForItemAtPosition:index];
+                    newFrame = CGRectMake(origin.x, origin.y, _itemSize.width, _itemSize.height);
+                }
                 // IF statement added for performance reasons (Time Profiling in instruments)
                 if (!CGRectEqualToRect(newFrame, view.frame)) 
                 {
@@ -1540,8 +1555,15 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
     UIView *currentView = [self cellForItemAtIndex:index];
     
     GMGridViewCell *cell = [self newItemSubViewForPosition:index];
-    CGPoint origin = [self.layoutStrategy originForItemAtPosition:index];
-    cell.frame = CGRectMake(origin.x, origin.y, _itemSize.width, _itemSize.height);
+    if([self.layoutStrategy respondsToSelector:@selector(frameForItemAtPosition:)])
+    {
+        cell.frame = [self.layoutStrategy frameForItemAtPosition:index];
+    }
+    else
+    {
+        CGPoint origin = [self.layoutStrategy originForItemAtPosition:index];
+        cell.frame = CGRectMake(origin.x, origin.y, _itemSize.width, _itemSize.height);
+    }
     cell.alpha = 0;
     [self addSubview:cell];
     
@@ -1576,8 +1598,15 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
     
     if (!self.pagingEnabled)
     {
-        CGRect gridRect = CGRectMake(origin.x, origin.y, _itemSize.width, _itemSize.height);
-
+        CGRect gridRect;
+        if([self.layoutStrategy respondsToSelector:@selector(frameForItemAtPosition:)])
+        {
+            gridRect = [self.layoutStrategy frameForItemAtPosition:index];
+        }
+        else
+        {
+            gridRect = CGRectMake(origin.x, origin.y, _itemSize.width, _itemSize.height);
+        }
         switch (scrollPosition)
         {
             case GMGridViewScrollPositionNone:

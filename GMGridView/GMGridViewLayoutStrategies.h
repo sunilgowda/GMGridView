@@ -76,6 +76,8 @@ typedef enum {
 
 - (NSRange)rangeOfPositionsInBoundsFromOffset:(CGPoint)offset;
 
+@optional
+- (CGRect)frameForItemAtPosition:(NSInteger)position;
 @end
 
 
